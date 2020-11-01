@@ -4,29 +4,41 @@ Organizados por sesiones.
 
 ## Intro
 
-Una presentación en el directorio raíz.
+PDF en el directorio raíz con las slides de preparación.
 
 ## Sesión 1
 
 En la carpeta sesion-1 encontrarás:
 
+* PDF con las slides de la sesión.
+
 ## Sesión 2
 
 En la carpeta sesion-2 encontrarás:
+
+* PDF con las slides de la sesión.
 
 ## Sesión 3
 
 En la carpeta sesion-3 encontrarás:
 
+* PDF con las slides de la sesión.
+
 ## Sesión 4
 
 En la carpeta sesion-4 encontrarás:
+
+* PDF con las slides de la sesión.
 
 ## Sesión 5
 
 En la carpeta sesion-5 encontrarás:
 
+* PDF con las slides de la sesión.
+
 ## Sesión 6
 
 En la carpeta sesion-6 encontrarás:
+
+* PDF con las slides de la sesión.
 
