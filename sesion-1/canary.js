@@ -12,6 +12,7 @@ exports.handler = async event => new Promise((resolve, reject) => {
 	});
 	
 	client.get('canary', (error, result) => {
+		if (error) return reject(error);
 		console.log(`Read canary ${result}`)
 		client.set('canary', 'alive', 'EX', 3 * 60, error => {
 			console.log('Canary refreshed');
