@@ -29,9 +29,9 @@ Log in the AWS console and go to "My Security Credentials" section and create a 
 
 ![img/Screen_Shot_2020-11-07_at_14.33.29.png](img/Screen_Shot_2020-11-07_at_14.33.29.png)
 
-AWSCLI works with profiles, to use different configurations, to avoid clashing with other configurations this manual will create a profile called `sre`
+AWSCLI works with profiles to use different configurations, to avoid clashing with other configurations this manual will create a profile called `sre`
 
-```bash
+```shell script
 $ aws configure --profile sre
 AWS Access Key ID [None]: # Access Key ID
 AWS Secret Access Key [None] # Access Secret Key
@@ -39,17 +39,20 @@ Default region name [None]: eu-west-3
 Default output format [None]: json
 ```
 
+For this course, we are going to use Paris Region: *eu-west-3* because the images used in this course are located in this region.
+
 ## Handling Key Pairs
 
-We need a Key-Pair to access any EC2 instance. To create one
+We need a Key-Pair to access any EC2 instance. **To create one key pair**:
 
-```bash
+```shell script
+# Note, this output should be saved. Otherwise private key will be lost
 $ aws ec2 create-key-pair --profile sre --key-name sre-kp
 {
-    "KeyFingerprint": "62:65:83:13:d9:2b:bc:47:49:a9:dd:98:38:d5:bc:38:38:6a:9f:fc",
-    "KeyMaterial": "-----BEGIN RSA PRIVATE KEY-----\nMIIEow...vu/93cvy0lYG3g\n-----END RSA PRIVATE KEY-----",
-    "KeyName": "sre",
-    "KeyPairId": "key-00e5efc6ae267d763"
+    "KeyFingerprint": "62:65:...:6a:9f:fc",
+    "KeyMaterial": "[PRIVATE KEY PEM CONTENT]",
+    "KeyName": "sre-kp",
+    "KeyPairId": "key-00e5xxxxxxxxxxxxx"
 }
 
 # To create directly a PEM file
@@ -58,15 +61,15 @@ $ aws ec2 create-key-pair --profile sre \
   --query "KeyMaterial" \
   --output text > sre-kp.pem
 
-# Even a KeyPair has no cost, to delete it
+# Even a KeyPair has no cost it can be deleted:
 $ aws ec2 delete-key-pair --profile sre --key-name sre-kp
 ```
 
-## Launching EC2 instances
+## AMI - Images
 
-First we need to find the base image to launch, to find by name:
+Before launching instances, we need to **find the image to launch**. To find by name:
 
-```bash
+```shell script
 $ aws ec2 describe-images --profile sre \
   --filters "Name=name,Values=pinchito*" \
   --query "Images[*].[Name,ImageId]"
@@ -82,9 +85,11 @@ $ aws ec2 describe-images --profile sre \
 ]
 ```
 
-With that ID to launch an instance:
+## Launching EC2 instances
 
-```bash
+**To launch** an ec2 instance, knowing beforehand the instance id:
+
+```shell script
 # Instance types: t2.small t2.micro t3.micro t3.small ...
 # Keep the InstaceId to delete the instance after use :)
 $ aws ec2 run-instances --profile sre \
@@ -100,31 +105,176 @@ $ aws ec2 run-instances --profile sre \
 ]
 ```
 
-To delete an instance
+**To delete** an instance:
 
-```bash
+```shell script
 $ aws ec2 terminate-instances --profile sre \
   --instance-ids i-013b7622be52e823f
 ```
 
-To check if we have any instance running
+We don't want to leave any resource running. **To check if we have any instance running**
 
-```bash
-# Watch out any non terminaed instance
+```shell script
+# Watch out any non terminated instance
 $ aws ec2 describe-instances --profile sre \
   --query "Reservations[].Instances[].[InstanceId,State.Name]"
 [
     [
         "i-029f38af0b66790b4",
         "terminated"
-    ],
-    [
-        "i-013b7622be52e823f",
-        "terminated"
-    ],
+    ]
     [
         "i-00ba20a1ecc0fd606",
         "terminated"
     ]
 ]
+```
+
+## ElastiCache
+
+To **create a Redis ElastiCache** service with no read replica (Good for test and dev):
+
+```shell script
+$ aws elasticache create-cache-cluster --profile sre \
+  --cache-cluster-id sre-cache-cluser \
+  --cache-node-type cache.t3.micro \
+  --engine redis \
+  --engine-version 3.2.4 \
+  --num-cache-nodes 1 \
+  --cache-parameter-group default.redis3.2
+```
+
+> This is a paid service, ensure deletion for avoid over costs.
+
+```shell script
+$ aws elasticache describe-cache-clusters --profile sre \
+  --cache-cluster-id sre-cache-cluser
+```
+**Delete an ElastiCache**
+
+```shell script
+$ aws elasticache delete-cache-cluster --profile sre \
+  --cache-cluster-id sre-cache-cluser
+```
+
+## AWS Lambda
+
+### Role
+
+To work with lambdas first we need to create a Role:
+
+1. Define a Trust Policy
+2. Create a Role for that Trust Policy (Assume Role)
+3. Attach the Role with a Lambda Execution Policy
+
+Create a file `trust-policy.json` with the Trust Policy. 
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "lambda.amazonaws.com"
+      },
+      "Action": "sts:AssumeRole"
+    }
+  ]
+}
+```
+
+**Create the Role**:
+
+```shell script
+$ aws iam create-role --profile sre \
+  --role-name sre-lambda-role2 \
+  --assume-role-policy-document file://trust-policy.json
+{
+  ...
+  "Arn": "arn:aws:iam::308242965872:role/sre-lambda-role"
+  ... 
+}
+```
+
+**Attatch Policy to Role**
+
+```shell script
+$ aws iam attach-role-policy --profile sre \
+  --role-name sre-lambda-role \
+  --policy-arn arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+```
+
+**Delete the role**, just in case:
+
+```shell script
+$ aws iam detach-role-policy --profile sre \
+  --role-name sre-lambda-role \
+  --policy-arn arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+
+$ aws iam delete-role --profile sre --role-name sre-lambda-role
+```
+
+### Function
+
+To create a function we need to create a **Deployment Package**, a zip file containing the lambda function. The simplest node lambda function is a single `index.js` file with no dependencies:
+
+```shell script
+zip function.zip index.js
+```
+
+**Create Lambda function** for nodejs12:
+
+```shell script
+$ aws lambda create-function --profile sre \
+  --function-name sre-lambda-function \
+  --zip-file fileb://function.zip \
+  --handler index.handler \
+  --runtime nodejs12.x \
+  --role arn:aws:iam::308242965872:role/sre-lambda-role
+```
+
+**Invoke a Lambda**
+
+```shell script
+# The LogResult is the base64 encoded output
+$ aws lambda invoke --profile sre \
+  --function-name sre-lambda-function out \
+  --log-type Tail
+{
+    "StatusCode": 200,
+    "LogResult": "U1RBUlQgUmVxdWVzdElkOiA4N2QwNDRiOC1mMTU...",
+    "ExecutedVersion": "$LATEST"
+}
+
+# To directly decode an output log
+$ $ aws lambda invoke --profile sre \
+  --function-name sre-lambda-function out \
+  --log-type Tail \
+  --query 'LogResult' --output text |  base64 -d
+
+START RequestId: 57f231fb-1730-4395-85cb-4f71bd2b87b8 Version: $LATEST
+...
+REPORT RequestId: 57f231fb-1730-4395-85cb-4f71bd2b87b8  Duration: 79.67 ms      Billed Duration: 100 ms         Memory Size: 128 MB     Max Memory Used: 73 MB
+```
+
+**List Lambdas**
+
+```shell script
+$ aws lambda --profile sre \
+  list-functions --max-items 10
+```
+
+**Get Lambda Definition**
+
+```shell script
+$ aws lambda get-function --profile sre \
+  --function-name sre-lambda-function
+```
+
+**Delete Lambda**
+
+```shell script
+$ aws lambda delete-function --profile sre \
+  --function-name sre-lambda-function
 ```
