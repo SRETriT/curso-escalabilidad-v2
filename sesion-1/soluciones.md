@@ -1,4 +1,4 @@
-# Soluciones
+# Soluciones a la sesión 1
 
 _Spoiler alert_:
 Evita leer las soluciones antes de intentar los ejercicios por tu cuenta.
