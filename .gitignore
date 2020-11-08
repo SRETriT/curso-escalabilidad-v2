@@ -105,3 +105,5 @@ dist
 
 # Alex
 *.swp
+package-lock.json
+
