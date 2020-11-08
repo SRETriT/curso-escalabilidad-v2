@@ -11,6 +11,8 @@ PDF en el directorio raíz con las slides de preparación.
 En la carpeta sesion-1 encontrarás:
 
 * PDF con las slides de la sesión.
+* [Soluciones](sesion-1/soluciones.md).
+* Carpeta [canary](sesion-1/canary).
 
 ## Sesión 2
 
