@@ -1,0 +1,12 @@
+{
+  "name": "sesion-1",
+  "version": "1.0.0",
+  "description": "",
+  "main": "canary.js",
+  "scripts": {
+    "deploy": "sls deploy"
+  },
+  "dependencies": {
+    "redis": "^3.0.2"
+  }
+}

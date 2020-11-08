@@ -1,0 +1,12 @@
+service: sre
+
+provider:
+  name: aws
+  region: eu-west-3
+
+  environment:
+    REDIS_HOST: ${env:REDIS_HOST}
+
+functions:
+  sre:
+    handler: canary.handler
