@@ -137,5 +137,13 @@ o si conseguimos reducir el mantenimiento por máquina.
 
 ## Ejercicio: Dispositivo de presencia.
 
-Ver código en [canary.js](./canary/canary.js).
+Primero debe arrancarse una instancia de Redis.
+Anotar IP y puerto.
+Después hay que modificar el fichero [canary.js](./canary/canary.js)
+para apuntar a la instancia de Redis.
+
+A continuación debe empaquetarse el código del directorio [canary](./canary/)
+en un fichero `.zip`, y subirlo a AWS Lambda.
+Al invocarlo escribirá en Redis un valor canario
+que permite saber si nuestro servicio está funcionando.
 
