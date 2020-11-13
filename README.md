@@ -19,6 +19,7 @@ En la carpeta sesion-1 encontrarás:
 En la carpeta sesion-2 encontrarás:
 
 * PDF con las slides de la sesión.
+* [Soluciones](sesion-2/soluciones.md).
 
 ## Sesión 3
 
