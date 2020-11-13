@@ -1,0 +1,14 @@
+{
+  "name": "latency",
+  "version": "0.0.1",
+  "description": "Measures latency",
+  "main": "latency.js",
+  "scripts": {
+    "test": "node latency.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "basic-request": "^3.0.4"
+  }
+}
