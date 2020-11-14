@@ -20,12 +20,18 @@ En la carpeta sesion-2 encontrarás:
 
 * PDF con las slides de la sesión.
 * [Soluciones](sesion-2/soluciones.md).
+* Carpeta [pareto](sesion-2/pareto)
+con todos los ejercicios de la distribución de Pareto:
+`pareto-initial.js` a `pareto-combined.js`.
 
 ## Sesión 3
 
 En la carpeta sesion-3 encontrarás:
 
 * PDF con las slides de la sesión.
+* [Soluciones](sesion-3/soluciones.md).
+* Carpeta [latency](sesion-3/latency) para hacer `npm install`,
+`node latency-a.js`, `node latency-d.js`.
 
 ## Sesión 4
 
