@@ -17,7 +17,7 @@ function answer(request, response) {
 		return
 	}
 	const id = paths[2]
-	getRedisResult(id).then(result => {
+	getResult(id).then(result => {
 		response.statusCode = 200
 		response.setHeader('Content-Type', 'application/json')
 		response.end(JSON.stringify(result, null, '\t'))
