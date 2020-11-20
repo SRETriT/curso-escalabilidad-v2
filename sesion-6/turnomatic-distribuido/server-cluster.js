@@ -7,7 +7,10 @@ const hostname = '0.0.0.0'
 const port = 7017
 const redisHost = 'service.pinchito.es'
 const redisPort = 7079
+let client = null
+let turno = 0
 
+cluster.schedulingPolicy = cluster.SCHED_NONE
 
 if (cluster.isMaster) {
 	fork()
@@ -30,8 +33,6 @@ function fork() {
 
 function startServer() {
 	const server = http.createServer(answer)
-	let client = null
-	let turno = 0
 
 	server.listen(port, hostname, () => {
 		console.log(`Server running at http://${hostname}:${port}/`)
@@ -51,6 +52,7 @@ function answer(request, response) {
 		response.setHeader('Content-Type', 'application/json')
 		response.end(JSON.stringify(result, null, '\t'))
 	}).catch(error => {
+		console.error(error)
 		response.statusCode = 500
 		response.end(JSON.stringify({error}))
 	})
