@@ -4,6 +4,7 @@ const http = require('http')
 const hostname = '0.0.0.0'
 const port = 7017
 const redisHost = 'localhost'
+const redisPort = 6379
 
 const server = http.createServer(answer)
 let client = null
@@ -46,7 +47,7 @@ function getRedisResult(id) {
 function initRedis() {
 	client = redis.createClient({
 		host: redisHost,
-		port: 6379,
+		port: redisPort,
 	})
 	client.on('error', function(error) {
 		console.error(error)
