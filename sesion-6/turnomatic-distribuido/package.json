@@ -1,0 +1,12 @@
+{
+  "name": "turnomatic-distribuido",
+  "version": "0.0.1",
+  "description": "A distributed turnomatic",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "redis": "^3.0.2"
+  }
+}
