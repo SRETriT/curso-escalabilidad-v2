@@ -36,26 +36,3 @@ server.listen(port, hostname, () => {
   console.log(`Server running at http://${hostname}:${port}/`)
 })
 
-function getRedisResult(id) {
-	return new Promise((resolve, reject) => {
-		if (!client) {
-			initRedis()
-		}
-		client.incr(id, (error, result) => {
-			if (error) return reject(error)
-			console.log(`Read ${id}: ${result}`)
-			resolve({id, turno: result})
-		})
-	})
-}
-
-function initRedis() {
-	client = redis.createClient({
-		host: 'clusterturnomatic.wkblaq.0001.euw3.cache.amazonaws.com',
-		port: 6379,
-	})
-	client.on('error', function(error) {
-		console.error(error)
-	})
-}
-
