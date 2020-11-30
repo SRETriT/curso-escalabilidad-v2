@@ -1,0 +1,12 @@
+[Unit]
+Description=Turnomatic Service
+StartLimitIntervalSec=500
+StartLimitBurst=5
+
+[Service]
+Restart=always
+RestartSec=5s
+ExecStart=/usr/bin/node /opt/server-cluster/server-cluster.js
+
+[Install]
+WantedBy=multi-user.target
