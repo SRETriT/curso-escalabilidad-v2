@@ -28,6 +28,10 @@ function fork() {
 
 	cluster.on('exit', (worker, code, signal) => {
 		console.log(`worker ${worker.process.pid} died`);
+		console.log(`code ${code}`)
+		console.log(`signal ${signal}`)
+		console.log("Restarting worker")
+		cluster.fork();
 	});
 }
 
@@ -40,6 +44,22 @@ function startServer() {
 }
 
 function answer(request, response) {
+	if (request.url === "/ready"){
+		response.statusCode = 200
+		response.end(JSON.stringify({ready:1}))
+		return
+	}
+	if (request.url === "/healthz") {
+		checkRedis().then(result => {
+			response.statusCode = 200
+			response.end(JSON.stringify({ok: 1}))
+		}).catch( error => {
+			response.statusCode = 400
+			response.end(JSON.stringify({ok: 0}))
+		})
+		
+		return
+	}
 	const paths = request.url.split('/')
 	if (paths.length < 3 || paths[0] !== '' || paths[1] != 'turno') {
 		response.statusCode = 400
@@ -55,6 +75,20 @@ function answer(request, response) {
 		console.error(error)
 		response.statusCode = 500
 		response.end(JSON.stringify({error}))
+	})
+}
+
+function checkRedis(){
+	return new Promise((resolve,reject ) => {
+		if (!client) {
+			initRedis()
+		}
+		client.ping((error, result) => {
+			if (error) {
+				reject (error)
+			}
+			resolve()
+		})
 	})
 }
 
